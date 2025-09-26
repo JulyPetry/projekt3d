@@ -6,6 +6,50 @@
     <title>AR model</title>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <style>
+      /* Space Nebula Background */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: -2;
+        background: radial-gradient(circle at 20% 30%, #ff3cac 0%, transparent 60%),
+                    radial-gradient(circle at 80% 70%, #00f0ff 0%, transparent 60%),
+                    radial-gradient(circle at 50% 80%, #ffd700 0%, transparent 60%),
+                    linear-gradient(135deg, #1e3c72 0%, #000 100%);
+        opacity: 0.7;
+      }
+
+      /* Animated Planets */
+      .planet {
+        position: fixed;
+        border-radius: 50%;
+        z-index: 1;
+        opacity: 0.8;
+        animation: floatPlanet 12s infinite linear;
+      }
+      .planet1 {
+        width: 80px; height: 80px;
+        left: 10vw; top: 15vh;
+        background: radial-gradient(circle at 30% 30%, #ff3cac 60%, #1e3c72 100%);
+        animation-delay: 0s;
+      }
+      .planet2 {
+        width: 60px; height: 60px;
+        left: 80vw; top: 60vh;
+        background: radial-gradient(circle at 60% 60%, #ffd700 60%, #ff6b00 100%);
+        animation-delay: 3s;
+      }
+      .planet3 {
+        width: 100px; height: 100px;
+        left: 60vw; top: 10vh;
+        background: radial-gradient(circle at 50% 50%, #00f0ff 60%, #1e3c72 100%);
+        animation-delay: 6s;
+      }
+      @keyframes floatPlanet {
+        0% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(40px) scale(1.1); }
+        100% { transform: translateY(0) scale(1); }
+      }
       #star-canvas {
         position: fixed;
         top: 0;
@@ -39,6 +83,7 @@
   flex-shrink: 0;
   border-radius: 15px; /* Ecken abrunden */
   overflow: hidden; /* Inhalt innerhalb der abgerundeten Ecken halten */
+  z-index: 1000;
       }
 
       .text-box {
@@ -58,20 +103,28 @@
       .rounded-title {
         font-family: 'Montserrat', Arial, Helvetica, sans-serif;
         font-weight: 900;
-        color: #fff;
-        background: none;
-        border: none;
-        font-size: 3rem;
-        letter-spacing: 2px;
-        margin: 32px 0 10px 0;
+  color: #fff;
+  background: none;
+        font-size: 4rem;
+        letter-spacing: 3px;
+        margin: 40px 0 20px 0;
         text-align: center;
         border-radius: 100px;
-        text-shadow: 0 2px 16px rgba(30,60,114,0.18), 0 0 0 #fff;
+        text-shadow: 0 0 32px #ffd700, 0 0 16px #ff3cac, 0 2px 16px #1e3c72;
         padding: 0 32px;
+        animation: glowTitle 2.5s infinite alternate;
       }
+      @keyframes glowTitle {
+        0% { text-shadow: 0 0 32px #ffd700, 0 0 16px #ff3cac, 0 2px 16px #1e3c72; }
+        100% { text-shadow: 0 0 64px #ff3cac, 0 0 32px #ffd700, 0 2px 32px #00f0ff; }
+      }
+    
     </style>
   </head>
   <body>
+  <div class="planet planet1"></div>
+  <div class="planet planet2"></div>
+  <div class="planet planet3"></div>
   <canvas id="star-canvas"></canvas>
   <h2 class="rounded-title">Pfand</h2>
 
@@ -101,16 +154,151 @@
         </svg>
       </a>
       <div style="position: fixed; left: 0; right: 0; bottom: 30px; text-align: center; z-index: 99; font-size: 14px; color: black; font-family: Arial, sans-serif; pointer-events: none;">
-        Hier gehts zu weiteren Kurs Projekten
+        <span style="
+          font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+          font-size: 0.9rem;
+          color: #fff;
+          background: linear-gradient(90deg, #ffd700 0%, #ff3cac 100%);
+          background-clip: text;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          text-shadow: 0 0 12px #ffd700, 0 0 6px #ff3cac;
+          border-radius: 40px;
+          padding: 4px 12px;
+          animation: glowText 2s infinite alternate;
+        ">
+          Hier gehts zu weiteren Kurs Projekten
+        </span>
       </div>
    
   </body>
 <script>
-  // Einfaches Feuerwerk im Hintergrund
+// 90s style flying 3D shapes
+const shapesCanvas = document.createElement('canvas');
+shapesCanvas.id = 'shapes-canvas';
+shapesCanvas.style.position = 'fixed';
+shapesCanvas.style.top = '0';
+shapesCanvas.style.left = '0';
+shapesCanvas.style.width = '100vw';
+shapesCanvas.style.height = '100vh';
+shapesCanvas.style.pointerEvents = 'none';
+shapesCanvas.style.zIndex = '1';
+document.body.appendChild(shapesCanvas);
+
+function resizeShapesCanvas() {
+  shapesCanvas.width = window.innerWidth;
+  shapesCanvas.height = window.innerHeight;
+}
+resizeShapesCanvas();
+window.addEventListener('resize', resizeShapesCanvas);
+
+const SHAPE_COLORS = [
+  '#FF3CAC', '#FFD700', '#00F0FF', '#1e3c72', '#FF6B00', '#00FFEA', '#FF00FF', '#00FF00', '#FF0000', '#FFFFFF'
+];
+const SHAPE_TYPES = ['cube', 'sphere', 'cone', 'cylinder'];
+let flyingShapes = [];
+for (let i = 0; i < 30; i++) {
+  flyingShapes.push({
+    type: SHAPE_TYPES[Math.floor(Math.random() * SHAPE_TYPES.length)],
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    size: Math.random() * 40 + 30,
+    color: SHAPE_COLORS[Math.floor(Math.random() * SHAPE_COLORS.length)],
+    dx: (Math.random() - 0.5) * 2.5,
+    dy: (Math.random() - 0.5) * 2.5,
+    rot: Math.random() * Math.PI * 2,
+    drot: (Math.random() - 0.5) * 0.04
+  });
+}
+
+function drawCube(ctx, x, y, size, rot, color) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillStyle = color;
+  ctx.globalAlpha = 0.85;
+  ctx.fillRect(-size/2, -size/2, size, size);
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(-size/2, -size/2, size, size);
+  ctx.restore();
+}
+function drawSphere(ctx, x, y, size, color) {
+  ctx.save();
+  ctx.globalAlpha = 0.85;
+  ctx.beginPath();
+  ctx.arc(x, y, size/2, 0, 2 * Math.PI);
+  ctx.fillStyle = color;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 16;
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  ctx.restore();
+}
+function drawCone(ctx, x, y, size, rot, color) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.globalAlpha = 0.85;
+  ctx.beginPath();
+  ctx.moveTo(0, -size/2);
+  ctx.lineTo(size/2, size/2);
+  ctx.lineTo(-size/2, size/2);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 12;
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  ctx.restore();
+}
+function drawCylinder(ctx, x, y, size, rot, color) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.globalAlpha = 0.85;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, size/2, size/3, 0, 0, 2 * Math.PI);
+  ctx.fillStyle = color;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 10;
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  ctx.restore();
+}
+
+function animateShapes() {
+  const ctx = shapesCanvas.getContext('2d');
+  ctx.clearRect(0, 0, shapesCanvas.width, shapesCanvas.height);
+  for (let s of flyingShapes) {
+    s.x += s.dx;
+    s.y += s.dy;
+    s.rot += s.drot;
+    if (s.x < -60) s.x = shapesCanvas.width + 60;
+    if (s.x > shapesCanvas.width + 60) s.x = -60;
+    if (s.y < -60) s.y = shapesCanvas.height + 60;
+    if (s.y > shapesCanvas.height + 60) s.y = -60;
+    if (s.type === 'cube') drawCube(ctx, s.x, s.y, s.size, s.rot, s.color);
+    if (s.type === 'sphere') drawSphere(ctx, s.x, s.y, s.size, s.color);
+    if (s.type === 'cone') drawCone(ctx, s.x, s.y, s.size, s.rot, s.color);
+    if (s.type === 'cylinder') drawCylinder(ctx, s.x, s.y, s.size, s.rot, s.color);
+  }
+  requestAnimationFrame(animateShapes);
+}
+animateShapes();
+  // Wild Space Fireworks & Planets
   const canvas = document.getElementById('star-canvas');
   const ctx = canvas.getContext('2d');
   let fireworks = [];
-  let particles = [];
   function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -119,35 +307,36 @@
   window.addEventListener('resize', resizeCanvas);
 
   function randomColor() {
-    const colors = ['#FFD700', '#FF3CAC', '#1e3c72', '#00FFEA', '#FF6B00', '#FFFFFF', '#00FF00', '#FF0000'];
+    const colors = ['#FFD700', '#FF3CAC', '#1e3c72', '#00FFEA', '#FF6B00', '#FFFFFF', '#00FF00', '#FF0000', '#FF00FF', '#00FFB2', '#FFB200'];
     return colors[Math.floor(Math.random() * colors.length)];
   }
 
   function Firework() {
     this.x = Math.random() * canvas.width;
     this.y = canvas.height;
-    this.targetY = Math.random() * canvas.height * 0.5 + 100;
+    this.targetY = Math.random() * canvas.height * 0.5 + 80;
     this.color = randomColor();
     this.exploded = false;
     this.particles = [];
-    this.vy = - (Math.random() * 3 + 4);
+    this.vy = - (Math.random() * 4 + 6);
+    this.size = Math.random() * 2 + 2;
   }
   Firework.prototype.update = function() {
     if (!this.exploded) {
       this.y += this.vy;
       if (this.y <= this.targetY) {
         this.exploded = true;
-        for (let i = 0; i < 40; i++) {
-          const angle = (Math.PI * 2) * (i / 40);
-          const speed = Math.random() * 2 + 1.5;
+        for (let i = 0; i < 60; i++) {
+          const angle = (Math.PI * 2) * (i / 60);
+          const speed = Math.random() * 3 + 2;
           this.particles.push({
             x: this.x,
             y: this.y,
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed,
             alpha: 1,
-            color: this.color,
-            radius: Math.random() * 2 + 1
+            color: randomColor(),
+            radius: Math.random() * 3 + 2
           });
         }
       }
@@ -155,8 +344,8 @@
       for (let p of this.particles) {
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.02; // gravity
-        p.alpha -= 0.015;
+        p.vy += 0.03; // gravity
+        p.alpha -= 0.012;
       }
       this.particles = this.particles.filter(p => p.alpha > 0);
     }
@@ -164,17 +353,23 @@
   Firework.prototype.draw = function(ctx) {
     if (!this.exploded) {
       ctx.beginPath();
-      ctx.arc(this.x, this.y, 3, 0, 2 * Math.PI);
+      ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
       ctx.fillStyle = this.color;
       ctx.globalAlpha = 1;
+      ctx.shadowColor = this.color;
+      ctx.shadowBlur = 20;
       ctx.fill();
+      ctx.shadowBlur = 0;
     } else {
       for (let p of this.particles) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
         ctx.fillStyle = p.color;
         ctx.globalAlpha = p.alpha;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 16;
         ctx.fill();
+        ctx.shadowBlur = 0;
       }
       ctx.globalAlpha = 1;
     }
@@ -182,7 +377,7 @@
 
   function animateFireworks() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (Math.random() < 0.03) {
+    if (Math.random() < 0.08) {
       fireworks.push(new Firework());
     }
     for (let fw of fireworks) {
