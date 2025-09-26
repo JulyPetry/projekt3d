@@ -6,9 +6,21 @@
     <title>AR model</title>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <style>
+      #star-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 0;
+        display: block;
+      }
+    </style>
+    <style>
         
       body {
-        background-color: rgb(32, 88, 179);
+        background: linear-gradient(135deg, #1e3c72 0%, #ffd700 100%);
         color: white;
         display: flex;
         flex-direction: column;
@@ -18,15 +30,15 @@
       }
 
       model-viewer {
-        width: 80%;
-        height: 50%;
-        min-height: 300px;
-        max-width: 800px;
-        margin: 20px 0;
-        background-color: rgb(255, 212, 167);
-        flex-shrink: 0;
-        border-radius: 15px; /* Ecken abrunden */
-        overflow: hidden; /* Inhalt innerhalb der abgerundeten Ecken halten */
+  width: 80%;
+  height: 50%;
+  min-height: 300px;
+  max-width: 800px;
+  margin: 20px 0;
+  background-color: transparent;
+  flex-shrink: 0;
+  border-radius: 15px; /* Ecken abrunden */
+  overflow: hidden; /* Inhalt innerhalb der abgerundeten Ecken halten */
       }
 
       .text-box {
@@ -42,15 +54,26 @@
         border-radius: 15px; /* Ecken abrunden */
       }
 
-      h2 {
-        margin: 10;
-        padding: 10px;
-        color: black;
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
+      .rounded-title {
+        font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+        font-weight: 900;
+        color: #fff;
+        background: none;
+        border: none;
+        font-size: 3rem;
+        letter-spacing: 2px;
+        margin: 32px 0 10px 0;
+        text-align: center;
+        border-radius: 100px;
+        text-shadow: 0 2px 16px rgba(30,60,114,0.18), 0 0 0 #fff;
+        padding: 0 32px;
       }
     </style>
   </head>
   <body>
-    <h2>Projekt</h2>
+  <canvas id="star-canvas"></canvas>
+  <h2 class="rounded-title">Pfand</h2>
 
     <model-viewer src="website1.glb"
                   ios-src="websitrec.usdz"
@@ -65,9 +88,110 @@
                   environment-image="neutral">   
     </model-viewer>
 
-    <div class="text-box">
-      Pfand  
-    </div>
+      <a href="https://schninnaa.github.io/Daisy/" style="position: fixed; left: 20px; bottom: 20px; text-decoration: none; z-index: 100;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="12" fill="white"/>
+          <path d="M14 8l-4 4 4 4" stroke="#1e3c72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <a href="https://illuilya.github.io/AR-Website/" style="position: fixed; right: 20px; bottom: 20px; text-decoration: none; z-index: 100;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="12" fill="white"/>
+          <path d="M10 8l4 4-4 4" stroke="#1e3c72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <div style="position: fixed; left: 0; right: 0; bottom: 30px; text-align: center; z-index: 99; font-size: 14px; color: black; font-family: Arial, sans-serif; pointer-events: none;">
+        Hier gehts zu weiteren Kurs Projekten
+      </div>
    
   </body>
+<script>
+  // Einfaches Feuerwerk im Hintergrund
+  const canvas = document.getElementById('star-canvas');
+  const ctx = canvas.getContext('2d');
+  let fireworks = [];
+  let particles = [];
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  function randomColor() {
+    const colors = ['#FFD700', '#FF3CAC', '#1e3c72', '#00FFEA', '#FF6B00', '#FFFFFF', '#00FF00', '#FF0000'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  function Firework() {
+    this.x = Math.random() * canvas.width;
+    this.y = canvas.height;
+    this.targetY = Math.random() * canvas.height * 0.5 + 100;
+    this.color = randomColor();
+    this.exploded = false;
+    this.particles = [];
+    this.vy = - (Math.random() * 3 + 4);
+  }
+  Firework.prototype.update = function() {
+    if (!this.exploded) {
+      this.y += this.vy;
+      if (this.y <= this.targetY) {
+        this.exploded = true;
+        for (let i = 0; i < 40; i++) {
+          const angle = (Math.PI * 2) * (i / 40);
+          const speed = Math.random() * 2 + 1.5;
+          this.particles.push({
+            x: this.x,
+            y: this.y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            alpha: 1,
+            color: this.color,
+            radius: Math.random() * 2 + 1
+          });
+        }
+      }
+    } else {
+      for (let p of this.particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.02; // gravity
+        p.alpha -= 0.015;
+      }
+      this.particles = this.particles.filter(p => p.alpha > 0);
+    }
+  };
+  Firework.prototype.draw = function(ctx) {
+    if (!this.exploded) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, 3, 0, 2 * Math.PI);
+      ctx.fillStyle = this.color;
+      ctx.globalAlpha = 1;
+      ctx.fill();
+    } else {
+      for (let p of this.particles) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+  };
+
+  function animateFireworks() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (Math.random() < 0.03) {
+      fireworks.push(new Firework());
+    }
+    for (let fw of fireworks) {
+      fw.update();
+      fw.draw(ctx);
+    }
+    fireworks = fireworks.filter(fw => !fw.exploded || fw.particles.length > 0);
+    requestAnimationFrame(animateFireworks);
+  }
+  animateFireworks();
+</script>
 </html>
