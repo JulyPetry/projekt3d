@@ -6,6 +6,40 @@
     <title>3D Scroll Demo</title>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <style>
+      @media (max-width: 700px) {
+        .text-box {
+          font-size: 1.05rem;
+          padding: 1.3rem 0.7rem 1.1rem 0.7rem;
+          max-width: 95vw;
+          border-radius: 1.2rem;
+        }
+        model-viewer {
+          width: 98vw;
+          max-width: 98vw;
+          min-width: 0;
+          height: 38vh;
+          min-height: 180px;
+          border-radius: 1.2rem;
+          margin: 0 0.2rem;
+        }
+        #scroll-container {
+          height: 100dvh;
+          width: 100vw;
+        }
+        html, body {
+          font-size: 16px;
+        }
+      }
+      @media (max-width: 400px) {
+        .text-box {
+          font-size: 0.95rem;
+          padding: 0.7rem 0.2rem 0.7rem 0.2rem;
+        }
+        model-viewer {
+          height: 28vh;
+          min-height: 100px;
+        }
+      }
       html, body {
         height: 100%;
         margin: 0;
