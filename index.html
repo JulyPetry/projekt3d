@@ -182,9 +182,8 @@
       </section>
     </div>
     <script>
-      // Tap auf Hintergrund triggert nächsten Abschnitt (für Touchgeräte)
+      // Tap auf Hintergrund: rechts = vorwärts, links = zurück
       document.getElementById('scroll-container').addEventListener('click', function(e) {
-        // Nur auslösen, wenn NICHT auf Textbox oder Model Viewer getippt wurde
         if (
           e.target.classList.contains('text-box') ||
           e.target.tagName.toLowerCase() === 'model-viewer'
@@ -192,7 +191,16 @@
           return;
         }
         if (scrollLocked) return;
-        if (currentStep < maxStep) {
+        const x = e.clientX;
+        const width = window.innerWidth;
+        if (x < width / 2 && currentStep > 0) {
+          // Linke Bildschirmhälfte: zurück
+          scrollLocked = true;
+          currentStep--;
+          updateSections();
+          setTimeout(() => { scrollLocked = false; }, 600);
+        } else if (x >= width / 2 && currentStep < maxStep) {
+          // Rechte Bildschirmhälfte: vorwärts
           scrollLocked = true;
           currentStep++;
           updateSections();
