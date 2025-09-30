@@ -11,6 +11,45 @@
           font-size: 1.05rem;
           padding: 1.3rem 0.7rem 1.1rem 0.7rem;
           max-width: 95vw;
+          max-height: 38vh;
+          border-radius: 1.2rem;
+          overflow-y: auto;
+        }
+        model-viewer {
+          width: 98vw;
+          max-width: 98vw;
+          min-width: 0;
+          height: 32vh;
+          min-height: 100px;
+          max-height: 38vh;
+          border-radius: 1.2rem;
+          margin: 0 0.2rem;
+        }
+        #scroll-container {
+          height: 100dvh;
+          width: 100vw;
+        }
+        html, body {
+          font-size: 16px;
+        }
+      }
+      @media (max-width: 400px) {
+        .text-box {
+          font-size: 0.95rem;
+          padding: 0.7rem 0.2rem 0.7rem 0.2rem;
+          max-height: 32vh;
+        }
+        model-viewer {
+          height: 22vh;
+          min-height: 60px;
+          max-height: 28vh;
+        }
+      }
+      @media (max-width: 700px) {
+        .text-box {
+          font-size: 1.05rem;
+          padding: 1.3rem 0.7rem 1.1rem 0.7rem;
+          max-width: 95vw;
           border-radius: 1.2rem;
         }
         model-viewer {
