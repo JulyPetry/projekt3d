@@ -182,6 +182,23 @@
       </section>
     </div>
     <script>
+      // Tap auf Hintergrund triggert nächsten Abschnitt (für Touchgeräte)
+      document.getElementById('scroll-container').addEventListener('click', function(e) {
+        // Nur auslösen, wenn NICHT auf Textbox oder Model Viewer getippt wurde
+        if (
+          e.target.classList.contains('text-box') ||
+          e.target.tagName.toLowerCase() === 'model-viewer'
+        ) {
+          return;
+        }
+        if (scrollLocked) return;
+        if (currentStep < maxStep) {
+          scrollLocked = true;
+          currentStep++;
+          updateSections();
+          setTimeout(() => { scrollLocked = false; }, 600);
+        }
+      });
       // 3D Scroll Effekt: Scrollen bewegt die Sections nach hinten
       const sections = document.querySelectorAll('.scroll-section');
       let maxStep = 2; // 0: vorne, 1: Mitte, 2: hinten
