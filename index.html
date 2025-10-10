@@ -88,6 +88,25 @@
       border-radius: inherit;
     }
 
+    /* --- Zwei Model Viewer nebeneinander --- */
+    .model-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: stretch;
+      gap: 30px;
+      width: 90%;
+      max-width: 1900px;
+      margin: 30px 0;
+    }
+
+    .model-row model-viewer {
+      flex: 1 1 400px;
+      width: 45%;
+      max-width: 900px;
+      height: 400px;
+    }
+
     /* --- Statische Bilderreihe --- */
     .image-row {
       display: flex;
@@ -178,8 +197,6 @@
     }
 
     /* --- Responsive Anpassungen --- */
-
-    /* Große Bildschirme (Desktop) */
     @media (min-width: 1200px) {
       .headline {
         font-size: clamp(4rem, 8vw, 10rem);
@@ -196,7 +213,6 @@
       }
     }
 
-    /* Mittlere Bildschirme (Tablet) */
     @media (max-width: 1024px) and (min-width: 600px) {
       .headline {
         font-size: clamp(3rem, 10vw, 8rem);
@@ -212,7 +228,18 @@
       }
     }
 
-    /* Kleine Bildschirme (Smartphones) */
+    @media (max-width: 900px) {
+      .model-row {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .model-row model-viewer {
+        width: 85%;
+        height: 300px;
+      }
+    }
+
     @media (max-width: 599px) {
       .headline {
         font-size: clamp(2.5rem, 14vw, 6rem);
@@ -243,10 +270,18 @@
     <span>S🧂LZIG</span>&nbsp;<span>SÜSS</span>
   </h1>
 
-  <!-- 3D Model -->
-  <model-viewer src="OK.glb" ios-src="OK.usdz" alt="Salzig Süß Modell" ar auto-rotate camera-controls autoplay
-    animation-loop ar-modes="webxr scene-viewer quick-look" environment-image="neutral">
-  </model-viewer>
+  <!-- Zwei 3D Modelle nebeneinander -->
+  <div class="model-row">
+    <model-viewer src="Szenario.glb" ios-src="Szenario.usdz" alt="Salzig Süß Modell"
+      ar auto-rotate camera-controls autoplay animation-loop
+      ar-modes="webxr scene-viewer quick-look" environment-image="neutral">
+    </model-viewer>
+
+    <model-viewer src="Säulen2.glb" ios-src="Säulen2.usdz" alt="Säulen Modell"
+      ar auto-rotate camera-controls autoplay animation-loop
+      ar-modes="webxr scene-viewer quick-look" environment-image="neutral">
+    </model-viewer>
+  </div>
 
   <!-- Statische Bilderreihe -->
   <div class="image-row">
@@ -262,12 +297,15 @@
 
   <!-- Textbox -->
   <div class="text-box">
-   Woher kommt eigentlich das lebenserhaltene und kulinarisch wertvolle Salz das wir tagtäglich benutzen?
+    Woher kommt eigentlich das lebenserhaltene und kulinarisch wertvolle Salz das wir tagtäglich benutzen?
     <br><br>
-   Unter Lüneburg liegt ein Schatz: das Salz, das die Stadt reich machte – und zugleich ihr Schicksal besiegelte.
-    Wo einst Sole abgepumpt wurde, blieben Hohlräume zurück. Heute sinkt die Altstadt, Straßen kippen, Häuser neigen sich.
+    Unter unserer Heimat Lüneburg liegt ein Schatz: das Salz, das die Stadt reich machte – und zugleich ihr Schicksal
+    besiegelte.
+    Wo einst Sole abgepumpt wurde, blieben Hohlräume zurück. Heute sinkt die Altstadt, Straßen kippen, Häuser neigen
+    sich.
     <br><br>
-    Die Lüneburger nennen die Kräfte im Untergrund „Senkungsteufel“. In alten Berichten klingt es, als tobten dort Kobolde,
+    Die Lüneburger nennen die Kräfte im Untergrund „Senkungsteufel“. In alten Berichten klingt es, als tobten dort
+    Kobolde,
     die Häuser verschieben und Straßen zerreißen.
   </div>
 
@@ -300,4 +338,5 @@
   </script>
 
 </body>
+
 </html>
