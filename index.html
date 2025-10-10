@@ -65,6 +65,7 @@
       filter: drop-shadow(0 6px 8px rgba(0,0,0,0.35));
       cursor: grab;
     }
+
     .sticker:active {
       cursor: grabbing;
     }
@@ -91,6 +92,7 @@
       position: relative;
       border-radius: 6px;
     }
+
     a:hover {
       transform: scale(1.05);
       background-color: #ffb100;
@@ -138,27 +140,11 @@
       background: rgba(255, 255, 255, 0.15);
     }
 
-    .text-box::-webkit-scrollbar {
-      width: 10px;
-    }
-    .text-box::-webkit-scrollbar-track {
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-    }
-    .text-box::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.3);
-      border-radius: 10px;
-    }
-    .text-box::-webkit-scrollbar-thumb:hover {
-      background: rgba(255,255,255,0.5);
-    }
-
     model-viewer {
       width: 80vw;
       height: 80vh;
       background: transparent;
     }
-
   </style>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 </head>
@@ -174,7 +160,6 @@
     <a href="https://illuilya.github.io/AR-Website/">Ilya</a>
   </div>
 
-  <!-- Overlay für 3D Viewer & Text -->
   <div id="overlay" class="overlay hidden">
     <div id="content"></div>
   </div>
@@ -183,7 +168,7 @@
     const stickers = [
       {src: 'Salz.png', alt: 'Salz'},
       {src: 'Teufel.png', alt: 'Teufel'},
-      {src: 'Lueneburg2.png', alt: 'Lueneburg 2'},
+      {src: 'Lueneburg2.png', alt: 'Lueneburg2'},
       {src: 'Salzstein.png', alt: 'Salzstein'},
       {src: 'Buch.png', alt: 'Buch'}
     ];
@@ -214,13 +199,15 @@
       img.src = item.src;
       img.alt = item.alt || '';
 
-      const chosenVW = minVW + Math.random() * (maxVW - minVW);
+      let chosenVW = minVW + Math.random() * (maxVW - minVW);
+      if (item.alt === 'Buch' || item.alt === 'Lueneburg2') {
+        chosenVW *= 1.4;
+      }
       img.style.width = chosenVW + 'vw';
 
       img.addEventListener('load', () => {
         const imgW = img.getBoundingClientRect().width;
         const imgH = img.getBoundingClientRect().height;
-
         const stageW = window.innerWidth;
         const stageH = window.innerHeight;
 
@@ -245,7 +232,6 @@
         img.style.transform = `rotate(${rot}deg)`;
 
         makeDraggable(img, item);
-
         stage.appendChild(img);
       });
     }
@@ -300,7 +286,8 @@
                 background-color="0 transparent">
               </model-viewer>
             `;
-          } else if(item.alt === 'Salz') {
+          } 
+          else if(item.alt === 'Salz') {
             content.innerHTML = `
               <model-viewer 
                 src="Säulen2.glb" 
@@ -314,7 +301,17 @@
                 background-color="0 transparent">
               </model-viewer>
             `;
-          } else {
+          }
+          else if(item.alt === 'Buch') {
+            content.innerHTML = `<div class="text-box">Woher kommt eigentlich das lebenserhaltende und kulinarisch wertvolle Salz, das wir tagtäglich benutzen?</div>`;
+          }
+          else if(item.alt === 'Lueneburg2') {
+            content.innerHTML = `<div class="text-box">Unter Lüneburg liegt ein Schatz: das Salz, das die Stadt reich machte – und zugleich ihr Schicksal besiegelte. Wo einst Sole abgepumpt wurde, blieben Hohlräume zurück. Heute sinkt die Altstadt, Straßen kippen, Häuser neigen sich.</div>`;
+          }
+          else if(item.alt === 'Teufel') {
+            content.innerHTML = `<div class="text-box">Die Lüneburger nennen die Kräfte im Untergrund „Senkungsteufel“. In alten Berichten klingt es, als tobten dort Kobolde, die Häuser verschieben und Straßen zerreißen.</div>`;
+          }
+          else {
             content.innerHTML = `<div class="text-box">Hier könnte Text oder ein anderes 3D-Modell angezeigt werden.</div>`;
           }
         }
@@ -326,10 +323,6 @@
     overlay.addEventListener('click', () => {
       overlay.classList.add('hidden');
       content.innerHTML = '';
-    });
-
-    window.addEventListener('resize', () => {
-      // Optional: neu positionieren oder anpassen
     });
   </script>
 </body>
