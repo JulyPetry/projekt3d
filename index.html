@@ -145,6 +145,18 @@
       height: 80vh;
       background: transparent;
     }
+
+    /* Pixel-Leiste am unteren Rand */
+    .pixel-row {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50px; /* Höhe des Pixel-Bildes */
+      background: url('Pixel.png') repeat-x bottom;
+      background-size: auto 50px; /* passt Höhe an */
+      z-index: 20;
+    }
   </style>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 </head>
@@ -163,6 +175,9 @@
   <div id="overlay" class="overlay hidden">
     <div id="content"></div>
   </div>
+
+  <!-- Pixel-Leiste -->
+  <div class="pixel-row"></div>
 
   <script>
     const stickers = [
