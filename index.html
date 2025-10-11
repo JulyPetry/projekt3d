@@ -161,14 +161,11 @@
       text-align: center;
     }
 
-    .text-box.left {
-      text-align: left;
-    }
-
     .text-box .scroll-content {
       max-height: 60vh;
       overflow-y: auto;
       padding-right: 10px;
+      text-align: center;
     }
 
     .text-box::after {
@@ -424,14 +421,20 @@
             content.innerHTML = `<div class="text-box">Woher kommt eigentlich das lebenserhaltende und kulinarisch wertvolle Salz, das wir tagtäglich benutzen?</div>`;
           }
           else if(item.alt === 'Lueneburg2') {
-            content.innerHTML = `<div class="text-box left">
+            content.innerHTML = `<div class="text-box">
               <div class="scroll-content">
-              Unter Lüneburg liegt ein Schatz: das Salz, das die Stadt reich machte – und zugleich ihr Schicksal besiegelte. ...
+                Unter Lüneburg liegt ein Schatz: das Salz, das die Stadt reich machte – und zugleich ihr Schicksal besiegelte. Wo einst Sole abgepumpt wurde, blieben Hohlräume zurück. Heute sinkt die Altstadt, Straßen kippen, Häuser neigen sich.<br><br>
+                Die Lüneburger Saline war eine Anlage zur Salzgewinnung, also ein Ort, an dem Salz aus natürlichen Quellen oder Salzlagern gewonnen und verarbeitet wurde. Sie war bis 1980 in Betrieb. In der Region Lüneburg liegen die Ablagerungen des rund 250 Millionen Jahre alten Zechsteinmeeres relativ nahe an der Oberfläche, weshalb sie schon früh mit einfachen Methoden abgebaut werden konnten.<br><br>
+                Einer alten Überlieferung zufolge entdeckte ein Jäger die erste Salzquelle, als er eine ungewöhnlich weiße Wildsau erlegte. Ihr weißes Fell war durch das kristallisierte Salz entstanden, in dem sie sich zuvor gewälzt hatte. Dieser Vorfall soll etwa um das Jahr 800 zur Entdeckung der Salzquelle in Lüneburg geführt haben.
               </div>
             </div>`;
           }
           else if(item.alt === 'Teufel') {
-            content.innerHTML = `<div class="text-box">Die Lüneburger nennen die Kräfte im Untergrund „Senkungsteufel“ ...</div>`;
+            content.innerHTML = `<div class="text-box">
+              <div class="scroll-content">
+                Die Lüneburger nennen die Kräfte im Untergrund „Senkungsteufel“. In alten Berichten klingt es, als tobten dort Kobolde, die Häuser verschieben und Straßen zerreißen.
+              </div>
+            </div>`;
           }
           else if(item.alt === 'Piskel') {
             content.innerHTML = `<div class="text-box">July Petry - July.Petry@haw-hamburg.de<br>2025-WiSe-3D</div>`;
@@ -445,7 +448,6 @@
 
     stickers.forEach(item => placeSticker(item));
 
-    // Overlay schließen beim Klick ins Leere
     overlay.addEventListener('click', e => {
       if (e.target === overlay) {
         overlay.classList.add('hidden');
@@ -454,7 +456,6 @@
       }
     });
 
-    // Back-Button Klick
     backBtn.addEventListener('click', () => {
       overlay.classList.add('hidden');
       content.innerHTML = '';
