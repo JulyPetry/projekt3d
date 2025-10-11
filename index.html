@@ -72,7 +72,7 @@
       transform-origin: center center;
       user-select: none;
       -webkit-user-drag: none;
-      z-index: 5;
+      z-index: 10;
       filter: drop-shadow(0 6px 8px rgba(0,0,0,0.35));
       cursor: grab;
       pointer-events: auto;
@@ -197,13 +197,35 @@
       height: 50px;
       background: url('Pixel.png') repeat-x bottom;
       background-size: auto 50px;
-      z-index: 20;
+      z-index: 5;
+      pointer-events: none;
     }
 
-    /* --- MOBILE FIX --- */
+    .back-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #ff4500;
+      color: white;
+      font-family: 'Anton', sans-serif;
+      border: 2px solid #ffb100;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #000;
+      z-index: 300;
+      display: none;
+    }
+
+    .back-button:hover {
+      background-color: #ffb100;
+      color: #000;
+    }
+
     @media (max-width: 768px) {
       body {
-        overflow: auto; /* erlaubt Scrollen bei kleinen Screens */
+        overflow: auto;
       }
 
       .sticker {
@@ -219,7 +241,7 @@
         left: 50%;
         transform: translateX(-50%);
         width: 90%;
-        white-space: normal; /* Texte dürfen umbrechen */
+        white-space: normal;
         text-align: center;
       }
 
@@ -265,6 +287,7 @@
 
   <div id="overlay" class="overlay hidden">
     <div id="content"></div>
+    <button class="back-button" id="backBtn">Zurück</button>
   </div>
 
   <div class="pixel-row"></div>
@@ -282,6 +305,7 @@
     const stage = document.getElementById('stage');
     const overlay = document.getElementById('overlay');
     const content = document.getElementById('content');
+    const backBtn = document.getElementById('backBtn');
 
     const minVW = 10;
     const maxVW = 18;
@@ -386,12 +410,15 @@
         if(distance < 5) { 
           overlay.classList.remove('hidden');
           content.innerHTML = '';
+          backBtn.style.display = 'none';
 
           if(item.alt === 'Salzstein') {
             content.innerHTML = `<model-viewer src="Szenario.glb" ios-src="Szenario.usdz" auto-rotate camera-controls></model-viewer>`;
+            backBtn.style.display = 'block';
           } 
           else if(item.alt === 'Salz') {
             content.innerHTML = `<model-viewer src="Säulen2.glb" ios-src="Säulen2.usdz" auto-rotate camera-controls></model-viewer>`;
+            backBtn.style.display = 'block';
           }
           else if(item.alt === 'Buch') {
             content.innerHTML = `<div class="text-box">Woher kommt eigentlich das lebenserhaltende und kulinarisch wertvolle Salz, das wir tagtäglich benutzen?</div>`;
@@ -399,14 +426,12 @@
           else if(item.alt === 'Lueneburg2') {
             content.innerHTML = `<div class="text-box left">
               <div class="scroll-content">
-              Unter Lüneburg liegt ein Schatz: das Salz, das die Stadt reich machte – und zugleich ihr Schicksal besiegelte. Wo einst Sole abgepumpt wurde, blieben Hohlräume zurück. Heute sinkt die Altstadt, Straßen kippen, Häuser neigen sich.<br><br>
-              Die Lüneburger Saline war eine Anlage zur Salzgewinnung, also ein Ort, an dem Salz aus natürlichen Quellen oder Salzlagern gewonnen und verarbeitet wurde. Sie war bis 1980 in Betrieb. In der Region Lüneburg liegen die Ablagerungen des rund 250 Millionen Jahre alten Zechsteinmeeres relativ nahe an der Oberfläche, weshalb sie schon früh mit einfachen Methoden abgebaut werden konnten.<br><br>
-              Einer alten Überlieferung zufolge entdeckte ein Jäger die erste Salzquelle, als er eine ungewöhnlich weiße Wildsau erlegte. Ihr weißes Fell war durch das kristallisierte Salz entstanden, in dem sie sich zuvor gewälzt hatte. Dieser Vorfall soll etwa um das Jahr 800 zur Entdeckung der Salzquelle in Lüneburg geführt haben.
+              Unter Lüneburg liegt ein Schatz: das Salz, das die Stadt reich machte – und zugleich ihr Schicksal besiegelte. ...
               </div>
             </div>`;
           }
           else if(item.alt === 'Teufel') {
-            content.innerHTML = `<div class="text-box">Die Lüneburger nennen die Kräfte im Untergrund „Senkungsteufel“. In alten Berichten klingt es, als tobten dort Kobolde, die Häuser verschieben und Straßen zerreißen.</div>`;
+            content.innerHTML = `<div class="text-box">Die Lüneburger nennen die Kräfte im Untergrund „Senkungsteufel“ ...</div>`;
           }
           else if(item.alt === 'Piskel') {
             content.innerHTML = `<div class="text-box">July Petry - July.Petry@haw-hamburg.de<br>2025-WiSe-3D</div>`;
@@ -420,9 +445,20 @@
 
     stickers.forEach(item => placeSticker(item));
 
-    overlay.addEventListener('click', () => {
+    // Overlay schließen beim Klick ins Leere
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) {
+        overlay.classList.add('hidden');
+        content.innerHTML = '';
+        backBtn.style.display = 'none';
+      }
+    });
+
+    // Back-Button Klick
+    backBtn.addEventListener('click', () => {
       overlay.classList.add('hidden');
       content.innerHTML = '';
+      backBtn.style.display = 'none';
     });
   </script>
 </body>
