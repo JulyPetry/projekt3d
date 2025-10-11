@@ -72,9 +72,10 @@
       transform-origin: center center;
       user-select: none;
       -webkit-user-drag: none;
-      z-index: 10;
+      z-index: 5;
       filter: drop-shadow(0 6px 8px rgba(0,0,0,0.35));
       cursor: grab;
+      pointer-events: auto;
     }
 
     .sticker:active {
@@ -85,12 +86,16 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 20px;
+      gap: 16px;
       position: absolute;
       bottom: 60px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 10;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+      text-align: center;
+      white-space: nowrap;
     }
 
     .link-label {
@@ -146,7 +151,7 @@
       color: #4b2c00;
       max-width: 80%;
       max-height: 70vh;
-      overflow-y: auto;
+      overflow: hidden;
       margin: auto;
       position: relative;
       z-index: 200;
@@ -158,6 +163,12 @@
 
     .text-box.left {
       text-align: left;
+    }
+
+    .text-box .scroll-content {
+      max-height: 60vh;
+      overflow-y: auto;
+      padding-right: 10px;
     }
 
     .text-box::after {
@@ -191,7 +202,31 @@
 
     @media (max-width: 768px) {
       .sticker {
-        transform: scale(1.4);
+        transform: scale(1.2);
+      }
+
+      .link-container {
+        flex-wrap: nowrap;
+        flex-direction: row;
+        gap: 8px;
+        bottom: 40px;
+      }
+
+      .link-label {
+        font-size: 1rem;
+      }
+
+      a {
+        font-size: 0.9rem;
+        padding: 8px 14px;
+      }
+
+      .headline {
+        font-size: clamp(2rem, 10vw, 6rem);
+      }
+
+      .subtext {
+        font-size: clamp(0.7rem, 1.8vw, 1rem);
       }
     }
   </style>
@@ -250,6 +285,7 @@
              box.bottom <= window.innerHeight;
     }
 
+    // 🌀 Neue Version: Sticker werden eher mittig platziert
     function placeSticker(item) {
       const img = new Image();
       img.className = 'sticker';
@@ -266,16 +302,31 @@
         const stageW = window.innerWidth;
         const stageH = window.innerHeight;
 
-        const minX = stageW * 0.2;
-        const maxX = stageW * 0.8 - imgW;
-        const minY = stageH * 0.2;
-        const maxY = stageH * 0.8 - imgH;
+        const topBuffer = 120;
+        const bottomBuffer = 150;
+        const leftBuffer = 20;
+        const rightBuffer = 20;
+
+        const minX = leftBuffer;
+        const maxX = stageW - imgW - rightBuffer;
+        const minY = topBuffer;
+        const maxY = stageH - imgH - bottomBuffer;
 
         const placedBoxes = Array.from(document.querySelectorAll('.sticker')).map(el => el.getBoundingClientRect());
         let leftPx, topPx, newBox, attempts = 0;
+
+        // zufällige Werte, die zur Mitte hin tendieren
+        function biasedRandom(min, max) {
+          const r = Math.random() * Math.random(); // verstärkt Mittelbereich
+          const mid = (min + max) / 2;
+          return Math.random() < 0.5
+            ? mid - r * (mid - min)
+            : mid + r * (max - mid);
+        }
+
         do {
-          leftPx = minX + Math.random() * (maxX - minX);
-          topPx = minY + Math.random() * (maxY - minY);
+          leftPx = biasedRandom(minX, maxX);
+          topPx = biasedRandom(minY, maxY);
           newBox = {left: leftPx, top: topPx, right: leftPx + imgW, bottom: topPx + imgH};
           attempts++;
         } while ((isOverlapping(newBox, placedBoxes) || !isWithinStage(newBox)) && attempts < 1000);
@@ -335,9 +386,11 @@
           }
           else if(item.alt === 'Lueneburg2') {
             content.innerHTML = `<div class="text-box left">
+              <div class="scroll-content">
               Unter Lüneburg liegt ein Schatz: das Salz, das die Stadt reich machte – und zugleich ihr Schicksal besiegelte. Wo einst Sole abgepumpt wurde, blieben Hohlräume zurück. Heute sinkt die Altstadt, Straßen kippen, Häuser neigen sich.<br><br>
               Die Lüneburger Saline war eine Anlage zur Salzgewinnung, also ein Ort, an dem Salz aus natürlichen Quellen oder Salzlagern gewonnen und verarbeitet wurde. Sie war bis 1980 in Betrieb. In der Region Lüneburg liegen die Ablagerungen des rund 250 Millionen Jahre alten Zechsteinmeeres relativ nahe an der Oberfläche, weshalb sie schon früh mit einfachen Methoden abgebaut werden konnten.<br><br>
               Einer alten Überlieferung zufolge entdeckte ein Jäger die erste Salzquelle, als er eine ungewöhnlich weiße Wildsau erlegte. Ihr weißes Fell war durch das kristallisierte Salz entstanden, in dem sie sich zuvor gewälzt hatte. Dieser Vorfall soll etwa um das Jahr 800 zur Entdeckung der Salzquelle in Lüneburg geführt haben.
+              </div>
             </div>`;
           }
           else if(item.alt === 'Teufel') {
@@ -347,18 +400,14 @@
             content.innerHTML = `<div class="text-box">July Petry - July.Petry@haw-hamburg.de<br>2025-WiSe-3D</div>`;
           }
 
-          // **Verhindere Klick-Propagation innerhalb des Overlays**
           const inner = content.firstElementChild;
-          if(inner) {
-            inner.addEventListener('click', e => e.stopPropagation());
-          }
+          if(inner) inner.addEventListener('click', e => e.stopPropagation());
         }
       });
     }
 
     stickers.forEach(item => placeSticker(item));
 
-    // Overlay nur schließen, wenn außerhalb des Inhalts geklickt wird
     overlay.addEventListener('click', () => {
       overlay.classList.add('hidden');
       content.innerHTML = '';
