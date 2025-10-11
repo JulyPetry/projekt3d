@@ -55,13 +55,12 @@
       transform: skew(-3deg);
     }
 
-    /* Hinweistext etwas weiter unterhalb des Titels */
     .subtext {
       font-family: 'Anton', sans-serif;
       font-size: clamp(0.8rem, 2vw, 1.2rem);
       color: #ff4500;
       text-align: center;
-      margin-top: 25px; /* weiter unten positioniert */
+      margin-top: 25px;
       margin-bottom: 20px;
       letter-spacing: 1px;
       z-index: 5;
@@ -82,16 +81,23 @@
       cursor: grabbing;
     }
 
-    /* Buttons über der Pixel-Leiste */
     .link-container {
       display: flex;
       justify-content: center;
+      align-items: center;
       gap: 20px;
       position: absolute;
       bottom: 60px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 10;
+    }
+
+    .link-label {
+      font-family: 'Anton', sans-serif;
+      color: #ffb100;
+      font-size: 1.5rem;
+      text-shadow: 2px 2px 0 #000;
     }
 
     a {
@@ -131,29 +137,39 @@
     }
 
     .text-box {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px) saturate(150%);
-      border: 2px solid rgba(255, 255, 255, 0.5);
+      background: linear-gradient(180deg, #f9f3d2 0%, #f6e6a7 100%);
+      border: 2px solid #c28b00;
       border-radius: 20px;
-      padding: 30px 40px;
-      font-size: 2rem;
-      text-align: center;
+      padding: 20px 30px;
+      font-size: clamp(1rem, 2vw, 1.4rem);
       font-family: 'Anton', sans-serif;
-      color: #fff;
+      color: #4b2c00;
       max-width: 80%;
       max-height: 70vh;
       overflow-y: auto;
       margin: auto;
       position: relative;
       z-index: 200;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      text-shadow: none;
+      line-height: 1.4;
+      text-align: center;
     }
 
-    .text-box:hover {
-      transform: scale(1.08);
-      box-shadow: 0 12px 35px rgba(0,0,0,0.6);
-      background: rgba(255, 255, 255, 0.15);
+    .text-box.left {
+      text-align: left;
+    }
+
+    .text-box::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(to right, #d9480f, #f5b400);
+      border-radius: 0 0 18px 18px;
+      opacity: 0.8;
     }
 
     model-viewer {
@@ -172,6 +188,12 @@
       background-size: auto 50px;
       z-index: 20;
     }
+
+    @media (max-width: 768px) {
+      .sticker {
+        transform: scale(1.4);
+      }
+    }
   </style>
 
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
@@ -186,8 +208,10 @@
   </div>
 
   <div class="link-container">
+    <span class="link-label">weitere Projekte</span>
     <a href="https://schninnaa.github.io/Daisy/">Daisy</a>
     <a href="https://illuilya.github.io/AR-Website/">Ilya</a>
+    <span class="link-label">von anderen Artists</span>
   </div>
 
   <div id="overlay" class="overlay hidden">
@@ -202,7 +226,8 @@
       {src: 'Teufel.png', alt: 'Teufel'},
       {src: 'Lueneburg2.png', alt: 'Lueneburg2'},
       {src: 'Salzstein.png', alt: 'Salzstein'},
-      {src: 'Buch.png', alt: 'Buch'}
+      {src: 'Buch.png', alt: 'Buch'},
+      {src: 'Piskel.png', alt: 'Piskel'}
     ];
 
     const stage = document.getElementById('stage');
@@ -232,9 +257,7 @@
       img.alt = item.alt || '';
 
       let chosenVW = minVW + Math.random() * (maxVW - minVW);
-      if (item.alt === 'Buch' || item.alt === 'Lueneburg2') {
-        chosenVW *= 1.4;
-      }
+      if (item.alt === 'Buch' || item.alt === 'Lueneburg2') chosenVW *= 1.4;
       img.style.width = chosenVW + 'vw';
 
       img.addEventListener('load', () => {
@@ -249,7 +272,6 @@
         const maxY = stageH * 0.8 - imgH;
 
         const placedBoxes = Array.from(document.querySelectorAll('.sticker')).map(el => el.getBoundingClientRect());
-
         let leftPx, topPx, newBox, attempts = 0;
         do {
           leftPx = minX + Math.random() * (maxX - minX);
@@ -262,7 +284,6 @@
         img.style.top = topPx + 'px';
         const rot = (Math.random() * rotRange * 2) - rotRange;
         img.style.transform = `rotate(${rot}deg)`;
-
         makeDraggable(img, item);
         stage.appendChild(img);
       });
@@ -295,7 +316,6 @@
         el.releasePointerCapture(e.pointerId);
         if (!isDragging) return;
         isDragging = false;
-
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
         const distance = Math.sqrt(dx*dx + dy*dy);
@@ -305,46 +325,32 @@
           content.innerHTML = '';
 
           if(item.alt === 'Salzstein') {
-            content.innerHTML = `
-              <model-viewer 
-                src="Szenario.glb" 
-                ios-src="Szenario.usdz" 
-                alt="3D Modell" 
-                auto-rotate 
-                camera-controls 
-                ar 
-                ar-modes="scene-viewer quick-look webxr" 
-                environment-image="neutral" 
-                background-color="0 transparent">
-              </model-viewer>
-            `;
+            content.innerHTML = `<model-viewer src="Szenario.glb" ios-src="Szenario.usdz" auto-rotate camera-controls></model-viewer>`;
           } 
           else if(item.alt === 'Salz') {
-            content.innerHTML = `
-              <model-viewer 
-                src="Säulen2.glb" 
-                ios-src="Säulen2.usdz" 
-                alt="3D Modell" 
-                auto-rotate 
-                camera-controls 
-                ar 
-                ar-modes="scene-viewer quick-look webxr" 
-                environment-image="neutral" 
-                background-color="0 transparent">
-              </model-viewer>
-            `;
+            content.innerHTML = `<model-viewer src="Säulen2.glb" ios-src="Säulen2.usdz" auto-rotate camera-controls></model-viewer>`;
           }
           else if(item.alt === 'Buch') {
             content.innerHTML = `<div class="text-box">Woher kommt eigentlich das lebenserhaltende und kulinarisch wertvolle Salz, das wir tagtäglich benutzen?</div>`;
           }
           else if(item.alt === 'Lueneburg2') {
-            content.innerHTML = `<div class="text-box">Unter Lüneburg liegt ein Schatz: das Salz, das die Stadt reich machte – und zugleich ihr Schicksal besiegelte. Wo einst Sole abgepumpt wurde, blieben Hohlräume zurück. Heute sinkt die Altstadt, Straßen kippen, Häuser neigen sich.</div>`;
+            content.innerHTML = `<div class="text-box left">
+              Unter Lüneburg liegt ein Schatz: das Salz, das die Stadt reich machte – und zugleich ihr Schicksal besiegelte. Wo einst Sole abgepumpt wurde, blieben Hohlräume zurück. Heute sinkt die Altstadt, Straßen kippen, Häuser neigen sich.<br><br>
+              Die Lüneburger Saline war eine Anlage zur Salzgewinnung, also ein Ort, an dem Salz aus natürlichen Quellen oder Salzlagern gewonnen und verarbeitet wurde. Sie war bis 1980 in Betrieb. In der Region Lüneburg liegen die Ablagerungen des rund 250 Millionen Jahre alten Zechsteinmeeres relativ nahe an der Oberfläche, weshalb sie schon früh mit einfachen Methoden abgebaut werden konnten.<br><br>
+              Einer alten Überlieferung zufolge entdeckte ein Jäger die erste Salzquelle, als er eine ungewöhnlich weiße Wildsau erlegte. Ihr weißes Fell war durch das kristallisierte Salz entstanden, in dem sie sich zuvor gewälzt hatte. Dieser Vorfall soll etwa um das Jahr 800 zur Entdeckung der Salzquelle in Lüneburg geführt haben.
+            </div>`;
           }
           else if(item.alt === 'Teufel') {
             content.innerHTML = `<div class="text-box">Die Lüneburger nennen die Kräfte im Untergrund „Senkungsteufel“. In alten Berichten klingt es, als tobten dort Kobolde, die Häuser verschieben und Straßen zerreißen.</div>`;
           }
-          else {
-            content.innerHTML = `<div class="text-box">Hier könnte Text oder ein anderes 3D-Modell angezeigt werden.</div>`;
+          else if(item.alt === 'Piskel') {
+            content.innerHTML = `<div class="text-box">July Petry - July.Petry@haw-hamburg.de<br>2025-WiSe-3D</div>`;
+          }
+
+          // **Verhindere Klick-Propagation innerhalb des Overlays**
+          const inner = content.firstElementChild;
+          if(inner) {
+            inner.addEventListener('click', e => e.stopPropagation());
           }
         }
       });
@@ -352,6 +358,7 @@
 
     stickers.forEach(item => placeSticker(item));
 
+    // Overlay nur schließen, wenn außerhalb des Inhalts geklickt wird
     overlay.addEventListener('click', () => {
       overlay.classList.add('hidden');
       content.innerHTML = '';
