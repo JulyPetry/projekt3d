@@ -341,13 +341,13 @@
         const leftBuffer = 20;
         const rightBuffer = 20;
 
+        const placedBoxes = Array.from(document.querySelectorAll('.sticker')).map(el => el.getBoundingClientRect());
+        let leftPx, topPx, newBox, attempts = 0;
+
         const minX = leftBuffer;
         const maxX = stageW - imgW - rightBuffer;
         const minY = topBuffer;
         const maxY = stageH - imgH - bottomBuffer;
-
-        const placedBoxes = Array.from(document.querySelectorAll('.sticker')).map(el => el.getBoundingClientRect());
-        let leftPx, topPx, newBox, attempts = 0;
 
         function biasedRandom(min, max) {
           const r = Math.random() * Math.random();
@@ -410,11 +410,29 @@
           backBtn.style.display = 'none';
 
           if(item.alt === 'Salzstein') {
-            content.innerHTML = `<model-viewer src="Szenario.glb" ios-src="Szenario.usdz" auto-rotate camera-controls></model-viewer>`;
+            content.innerHTML = `<model-viewer 
+              src="Szenario.glb" 
+              ios-src="Szenario.usdz" 
+              auto-rotate 
+              camera-controls 
+              ar 
+              ar-modes="webxr scene-viewer quick-look" 
+              environment-image="neutral" 
+              shadow-intensity="1">
+            </model-viewer>`;
             backBtn.style.display = 'block';
           } 
           else if(item.alt === 'Salz') {
-            content.innerHTML = `<model-viewer src="Säulen2.glb" ios-src="Säulen2.usdz" auto-rotate camera-controls></model-viewer>`;
+            content.innerHTML = `<model-viewer 
+              src="Säulen2.glb" 
+              ios-src="Säulen2.usdz" 
+              auto-rotate 
+              camera-controls 
+              ar 
+              ar-modes="webxr scene-viewer quick-look" 
+              environment-image="neutral" 
+              shadow-intensity="1">
+            </model-viewer>`;
             backBtn.style.display = 'block';
           }
           else if(item.alt === 'Buch') {
