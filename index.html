@@ -200,25 +200,39 @@
       z-index: 20;
     }
 
+    /* --- MOBILE FIX --- */
     @media (max-width: 768px) {
+      body {
+        overflow: auto; /* erlaubt Scrollen bei kleinen Screens */
+      }
+
       .sticker {
         transform: scale(1.2);
       }
 
       .link-container {
-        flex-wrap: nowrap;
-        flex-direction: row;
+        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: center;
         gap: 8px;
         bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        white-space: normal; /* Texte dürfen umbrechen */
+        text-align: center;
       }
 
       .link-label {
         font-size: 1rem;
+        white-space: normal;
       }
 
       a {
         font-size: 0.9rem;
         padding: 8px 14px;
+        max-width: 100%;
+        word-wrap: break-word;
       }
 
       .headline {
@@ -285,7 +299,6 @@
              box.bottom <= window.innerHeight;
     }
 
-    // 🌀 Neue Version: Sticker werden eher mittig platziert
     function placeSticker(item) {
       const img = new Image();
       img.className = 'sticker';
@@ -315,9 +328,8 @@
         const placedBoxes = Array.from(document.querySelectorAll('.sticker')).map(el => el.getBoundingClientRect());
         let leftPx, topPx, newBox, attempts = 0;
 
-        // zufällige Werte, die zur Mitte hin tendieren
         function biasedRandom(min, max) {
-          const r = Math.random() * Math.random(); // verstärkt Mittelbereich
+          const r = Math.random() * Math.random();
           const mid = (min + max) / 2;
           return Math.random() < 0.5
             ? mid - r * (mid - min)
